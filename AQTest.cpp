@@ -22,21 +22,21 @@ void print(const std::string& s)
 class SampleAsyncRequest : public AsyncRequest {
 public:
     explicit SampleAsyncRequest(int i)
-		:
-		index_(i)
-	{
-	}
+        :
+        index_(i)
+    {
+    }
 
     virtual ~SampleAsyncRequest()
-	{
-	}
+    {
+    }
 
-	// Must override call() in derived classes
-	//
+    // Must override call() in derived classes
+    //
     virtual void call()
-	{
+    {
         using namespace std;
-		std::ostringstream out;
+        std::ostringstream out;
         out << "Function: "<<  __func__  << "(), index: " << index_;
         print(out.str());
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
 
     AsyncRequest* request = nullptr;
 
-	// we have TOTAL_TASKS to perform,
-	// we submit tasks in chunks of up to qsize
-	//
+    // we have TOTAL_TASKS to perform,
+    // we submit tasks in chunks of up to qsize
+    //
     for (;;) {
         int chunk = std::min(tasks_remaining, qsize);
 
@@ -82,44 +82,44 @@ int main(int argc, char* argv[])
             --chunk;
         }
 
-		// container to collect all returned tasks
-		//
+        // container to collect all returned tasks
+        //
         std::deque<AsyncRequest*> results;
 
-		// poll fills all returned tasks in results if there are any
-		//
+        // poll fills all returned tasks in results if there are any
+        //
         auto rc = aq->poll(results);
 
-		// query the results
-		//
+        // query the results
+        //
         if (rc == AResult::Empty) {
-			// if both empty AND no tasks remaining, we are done
-			//
+            // if both empty AND no tasks remaining, we are done
+            //
             if (tasks_remaining == 0)
                 break;
         }
         else if (rc == AResult::Ready) {
-			// Some results were ready when calling poll. Here we just
-			// cleanup the tasks object
-			//
+            // Some results were ready when calling poll. Here we just
+            // cleanup the tasks object
+            //
             for (auto p : results) {
                 treceived++;
                 delete p;
             }
         }
         else if (rc == AResult::Pending) {
-			// Some tasks were being processed but not finished yet
-			// we can sleep or block (with or without timeout) until some
-			// results are ready. Here we block until a result is ready,
-			// but with timeout of 1000 microsecond
-			//
+            // Some tasks were being processed but not finished yet
+            // we can sleep or block (with or without timeout) until some
+            // results are ready. Here we block until a result is ready,
+            // but with timeout of 1000 microsecond
+            //
             auto acked = aq->receive_uptr<SampleAsyncRequest>(1000 /* microseconds */);
 
-			// If evaulates to false then we got a timeout
-			//
+            // If evaulates to false then we got a timeout
+            //
             if (acked) {
-				treceived++;
-			}
+                treceived++;
+            }
         }
     }
     print("Just Before SHUTDOWN");
