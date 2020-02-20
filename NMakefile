@@ -1,0 +1,24 @@
+# AQTest Makefile
+#
+CXX=cl
+OBJS = 	AsyncRequest.obj AQTest.obj
+CXXFLAGS = /EHsc /O2 /nologo /EHsc /MD
+DEPS = AsyncRequest.hpp NMakefile
+EXE = aqtest.exe
+
+all: $(EXE)
+
+$(EXE): $(OBJS)
+	$(CC) /nologo /MD -Fe"$(EXE)" $(OBJS)
+
+clean:
+	del *~ $(OBJS)
+
+distclean: clean
+	del $(EXE)
+
+AsyncRequest.obj: AsyncRequest.cpp $(DEPS)
+	$(CXX) -c $(CXXFLAGS) AsyncRequest.cpp
+
+AQTest.obj: AQTest.cpp $(DEPS)
+	$(CXX) -c $(CXXFLAGS) AQTest.cpp
